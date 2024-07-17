@@ -19,7 +19,6 @@ class Buku:
         return f"{self.judul} by {self.penulis}"
 
 # B. Membuat Table Buku pada Basis Data
-# Berikut adalah contoh SQL untuk membuat tabel:
 '''
 CREATE TABLE buku (
     id INT AUTO_INCREMENT PRIMARY KEY,
