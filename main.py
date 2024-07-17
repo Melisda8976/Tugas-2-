@@ -33,18 +33,24 @@ CREATE TABLE buku (
 
 # C. Membuat Method GET untuk Mengambil Data dari Basis Data
 def get_buku_by_id(buku_id):
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="perpustakaan"
-    )
-    cursor = conn.cursor()
-    query = "SELECT * FROM buku WHERE id = %s"
-    cursor.execute(query, (buku_id,))
-    result = cursor.fetchone()
-    cursor.close()
-    conn.close()
+    try:
+        conn = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="perpustakaan"
+        )
+        cursor = conn.cursor()
+        query = "SELECT * FROM buku WHERE id = %s"
+        cursor.execute(query, (buku_id,))
+        result = cursor.fetchone()
+    except mysql.connector.Error as err:
+        log_error(f"Error: {err}")
+        return None
+    finally:
+        cursor.close()
+        conn.close()
+
     if result:
         konten_list = result[5].split(',')
         return Buku(result[1], result[2], result[3], result[4], konten_list, result[6])
@@ -64,11 +70,12 @@ def save_buku(buku):
         konten_str = ",".join(buku.konten)
         cursor.execute(query, (buku.judul, buku.penulis, buku.penerbit, buku.tahun_terbit, konten_str, buku.ikhtisar))
         conn.commit()
-        cursor.close()
-        conn.close()
     except mysql.connector.Error as err:
         log_error(f"Error: {err}")
         print(f"Error: {err}")
+    finally:
+        cursor.close()
+        conn.close()
 
 # E. Membuat Logger dan HTTP Exception
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
